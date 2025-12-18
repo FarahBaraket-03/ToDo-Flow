@@ -382,7 +382,7 @@ This project is licensed under the MIT License.
 
 ## 👨‍💻 Author
 
-Created with ❤️ by [Your Name]
+Created with ❤️ by Farah Baraket
 
 ## 🙏 Acknowledgments
 
@@ -392,7 +392,7 @@ Created with ❤️ by [Your Name]
 
 ## 📞 Support
 
-For support, email your-email@example.com or open an issue in the repository.
+For support, email me or open an issue in the repository.
 
 ---
 
