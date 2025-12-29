@@ -31,9 +31,20 @@ app.get('/api', (req, res) => {
   res.send('Welcome to ToDo-Flow backend!');
 });
 
+app.get('/', (req, res) => {
+  res.send('Welcome to ToDo-Flow backend!');
+});
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'ok', 
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV 
+  });
+});
+
+app.get('/health', (req, res) => {
   res.json({ 
     status: 'ok', 
     timestamp: new Date().toISOString(),
