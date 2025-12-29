@@ -1,19 +1,13 @@
-# Backend Dockerfile
-FROM node:18-alpine
+# Utiliser Node 18
+FROM node:18
 
 WORKDIR /app
 
-# Copy package files
 COPY package*.json ./
+RUN npm install
 
-# Install dependencies
-RUN npm ci --only=production
-
-# Copy source code
 COPY . .
 
-# Expose port
 EXPOSE 5000
 
-# Start the application
-CMD ["npm", "start"]
+CMD ["node", "src/server.js"]
