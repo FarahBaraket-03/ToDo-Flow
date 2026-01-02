@@ -136,18 +136,26 @@ const Completed = () => {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      <Sidebar 
-        projects={projects} 
-        onAddTask={() => setShowAddTask(true)}
-        isOpen={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
-      />
-      
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <Header onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 overflow-hidden">
+      {/* Animated background elements */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-20 right-10 w-72 h-72 bg-primary-200 dark:bg-primary-900/30 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+        <div className="absolute top-40 left-10 w-72 h-72 bg-blue-200 dark:bg-blue-900/30 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="absolute -bottom-8 left-20 w-72 h-72 bg-purple-200 dark:bg-purple-900/30 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+      </div>
+
+      <div className="relative z-10 flex h-screen overflow-hidden">
+        <Sidebar 
+          projects={projects} 
+          onAddTask={() => setShowAddTask(true)}
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+        />
         
-        <main className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900">
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <Header onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
+          
+          <main className="flex-1 overflow-y-auto">
           <div className="max-w-5xl mx-auto px-4 md:px-8 py-4 md:py-8">
             {/* Header with stats */}
             <div className="mb-8">
@@ -385,6 +393,7 @@ const Completed = () => {
           </div>
         </main>
       </div>
+    </div>
     </div>
   );
 };

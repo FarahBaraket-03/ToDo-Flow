@@ -21,6 +21,8 @@ const Upcoming = () => {
   const [filterPriority, setFilterPriority] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [mobileSelectedDay, setMobileSelectedDay] = useState(new Date());
+  const [selectedTask, setSelectedTask] = useState(null);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -160,18 +162,26 @@ const Upcoming = () => {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      <Sidebar 
-        projects={projects} 
-        onAddTask={() => setShowAddTask(true)}
-        isOpen={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
-      />
-      
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <Header onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 overflow-hidden">
+      {/* Animated background elements */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-20 right-10 w-72 h-72 bg-primary-200 dark:bg-primary-900/30 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+        <div className="absolute top-40 left-10 w-72 h-72 bg-blue-200 dark:bg-blue-900/30 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="absolute -bottom-8 left-20 w-72 h-72 bg-purple-200 dark:bg-purple-900/30 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+      </div>
+
+      <div className="relative z-10 flex h-screen overflow-hidden">
+        <Sidebar 
+          projects={projects} 
+          onAddTask={() => setShowAddTask(true)}
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+        />
         
-        <main className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900">
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <Header onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
+          
+          <main className="flex-1 overflow-y-auto">
           <div className="max-w-7xl mx-auto px-4 md:px-8 py-4 md:py-6">
             {/* Header */}
             <div className="mb-6">
@@ -313,8 +323,148 @@ const Upcoming = () => {
             </div>
 
             {viewMode === 'calendar' ? (
-              /* Calendar View */
-              <div className="hidden md:block bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm">
+              <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm">
+                {/* Mobile Calendar View - Single Day */}
+                <div className="md:hidden">
+                  {/* Mobile Day Navigation */}
+                  <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+                    <button
+                      onClick={() => setMobileSelectedDay(addDays(mobileSelectedDay, -1))}
+                      className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                    >
+                      <ChevronLeft className="w-5 h-5" />
+                    </button>
+                    <div className="text-center">
+                      <div className="text-xs text-gray-500 dark:text-gray-400 capitalize font-medium">
+                        {format(mobileSelectedDay, 'EEEE', { locale: fr })}
+                      </div>
+                      <div className={`text-2xl font-bold ${
+                        isSameDay(mobileSelectedDay, new Date())
+                          ? 'text-primary-600 dark:text-primary-400'
+                          : 'text-gray-900 dark:text-gray-100'
+                      }`}>
+                        {format(mobileSelectedDay, 'd MMMM', { locale: fr })}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setMobileSelectedDay(addDays(mobileSelectedDay, 1))}
+                      className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                    >
+                      <ChevronRight className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  {/* Mobile All-Day Tasks */}
+                  {getAllDayTasks(mobileSelectedDay).length > 0 && (
+                    <div className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 p-3">
+                      <div className="text-xs text-gray-500 dark:text-gray-400 mb-2 font-medium">
+                        Toute la journée
+                      </div>
+                      {getAllDayTasks(mobileSelectedDay).map((task) => (
+                        <div
+                          key={task.id}
+                          className="mb-2 p-3 rounded-lg text-white shadow-sm cursor-pointer hover:opacity-90 transition-opacity"
+                          style={{ backgroundColor: getTaskColor(task) }}
+                          onClick={() => setSelectedTask(task)}
+                        >
+                          <div className="flex items-center gap-2 mb-1">
+                            {task.priority === 'urgent' && <span>🔥</span>}
+                            <span className="font-semibold">{task.title}</span>
+                          </div>
+                          {task.description && (
+                            <div className="text-xs opacity-90 line-clamp-2">{task.description}</div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Mobile Time Grid */}
+                  <div className="overflow-y-auto max-h-[calc(100vh-400px)]">
+                    <div className="flex">
+                      {/* Time column */}
+                      <div className="w-16 bg-gray-50 dark:bg-gray-800/50 flex-shrink-0">
+                        {timeSlots.map((hour) => (
+                          <div key={hour} className="h-16 border-b border-gray-100 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400 pr-2 text-right pt-1 font-medium">
+                            {hour}:00
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Day column */}
+                      <div className="flex-1 relative border-l border-gray-200 dark:border-gray-700">
+                        {/* Hour lines */}
+                        {timeSlots.map((hour) => (
+                          <div key={hour} className="h-16 border-b border-gray-100 dark:border-gray-700" />
+                        ))}
+
+                        {/* Tasks */}
+                        {getTimedTasks(mobileSelectedDay).map((task) => {
+                          const style = getTaskStyle(task);
+                          if (!style) return null;
+                          const taskDate = parseISO(task.dueDate);
+                          
+                          return (
+                            <div
+                              key={task.id}
+                              className="absolute left-1 right-1 rounded-lg px-3 py-2 text-white text-sm shadow-md border-l-4 border-white/40 cursor-pointer hover:opacity-90 transition-opacity"
+                              style={style}
+                              onClick={() => setSelectedTask(task)}
+                            >
+                              <div className="flex items-center gap-1 mb-1">
+                                <Clock className="w-3 h-3 opacity-80" />
+                                <span className="text-xs font-semibold opacity-90">
+                                  {format(taskDate, 'HH:mm')}
+                                </span>
+                                {task.priority === 'urgent' && <span className="ml-auto">🔥</span>}
+                              </div>
+                              <div className="font-semibold line-clamp-1">{task.title}</div>
+                              {task.description && (
+                                <div className="text-xs opacity-80 line-clamp-1 mt-1">{task.description}</div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Mobile Quick Day Selector */}
+                  <div className="border-t border-gray-200 dark:border-gray-700 p-2 flex gap-1 overflow-x-auto">
+                    {weekDays.map((day, index) => {
+                      const isSelected = isSameDay(day, mobileSelectedDay);
+                      const isToday = isSameDay(day, new Date());
+                      const dayTasks = getTasksForDay(day);
+                      
+                      return (
+                        <button
+                          key={index}
+                          onClick={() => setMobileSelectedDay(day)}
+                          className={`flex-shrink-0 flex flex-col items-center justify-center w-12 h-16 rounded-lg transition-all ${
+                            isSelected
+                              ? 'bg-primary-600 text-white shadow-md'
+                              : isToday
+                              ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400'
+                              : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
+                          }`}
+                        >
+                          <span className="text-[10px] font-medium capitalize">
+                            {format(day, 'EEE', { locale: fr })}
+                          </span>
+                          <span className="text-lg font-bold">{format(day, 'd')}</span>
+                          {dayTasks.length > 0 && (
+                            <div className={`w-1 h-1 rounded-full mt-0.5 ${
+                              isSelected ? 'bg-white' : 'bg-primary-600 dark:bg-primary-400'
+                            }`} />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Desktop Calendar View - Full Week */}
+                <div className="hidden md:block">
                 {/* Week header */}
                 <div className="grid grid-cols-[80px_repeat(7,1fr)] border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
                   <div className="p-4"></div>
@@ -358,7 +508,7 @@ const Upcoming = () => {
                             key={task.id}
                             className="mb-1 p-2 rounded-md text-xs text-white truncate cursor-pointer hover:opacity-90 transition-all hover:shadow-md"
                             style={{ backgroundColor: getTaskColor(task) }}
-                            title={`${task.title}${task.description ? ' - ' + task.description : ''}`}
+                            onClick={() => setSelectedTask(task)}
                           >
                             <div className="flex items-center gap-1">
                               {task.priority === 'urgent' && <span className="text-[10px]">🔥</span>}
@@ -407,7 +557,7 @@ const Upcoming = () => {
                                 key={task.id}
                                 className="absolute left-1 right-1 rounded-md px-2 py-1 text-white text-xs cursor-pointer hover:opacity-90 hover:shadow-lg transition-all overflow-hidden border-l-2 border-white/30"
                                 style={style}
-                                title={`${task.title} - ${format(taskDate, 'HH:mm', { locale: fr })}`}
+                                onClick={() => setSelectedTask(task)}
                               >
                                 <div className="flex items-center gap-1 mb-0.5">
                                   <Clock className="w-3 h-3 opacity-80" />
@@ -428,6 +578,7 @@ const Upcoming = () => {
                     })}
                   </div>
                 </div>
+              </div>
               </div>
             ) : (
               /* List View */
@@ -558,6 +709,137 @@ const Upcoming = () => {
           projects={projects}
         />
       )}
+
+      {/* Task Detail Modal */}
+      {selectedTask && (
+        <div 
+          className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 animate-fade-in"
+          onClick={() => setSelectedTask(null)}
+        >
+          <div 
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-lg w-full animate-scale-in"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div 
+              className="p-4 rounded-t-lg border-b border-gray-200 dark:border-gray-700"
+              style={{ backgroundColor: getTaskColor(selectedTask) }}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    {selectedTask.priority === 'urgent' && <span className="text-lg">🔥</span>}
+                    <h3 className="text-lg font-semibold text-white">
+                      {selectedTask.title}
+                    </h3>
+                  </div>
+                  {selectedTask.dueDate && (
+                    <div className="flex items-center gap-2 text-white/90 text-sm">
+                      <CalendarIcon className="w-4 h-4" />
+                      <span>{format(parseISO(selectedTask.dueDate), 'EEEE d MMMM yyyy', { locale: fr })}</span>
+                      {parseISO(selectedTask.dueDate).getHours() !== 0 && (
+                        <>
+                          <Clock className="w-4 h-4 ml-2" />
+                          <span>{format(parseISO(selectedTask.dueDate), 'HH:mm')}</span>
+                        </>
+                      )}
+                    </div>
+                  )}
+                </div>
+                <button
+                  onClick={() => setSelectedTask(null)}
+                  className="p-1 hover:bg-white/20 rounded-lg transition-colors text-white"
+                  aria-label="Fermer"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            {/* Body */}
+            <div className="p-6 space-y-4">
+              {/* Description */}
+              {selectedTask.description && (
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Description</h4>
+                  <p className="text-gray-600 dark:text-gray-400 text-sm whitespace-pre-wrap">
+                    {selectedTask.description}
+                  </p>
+                </div>
+              )}
+
+              {/* Project */}
+              {selectedTask.project && (
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Projet</h4>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl">{selectedTask.project.icon}</span>
+                    <span className="text-gray-900 dark:text-gray-100">{selectedTask.project.name}</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Priority */}
+              <div>
+                <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Priorité</h4>
+                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                  selectedTask.priority === 'urgent' ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400' :
+                  selectedTask.priority === 'high' ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400' :
+                  selectedTask.priority === 'medium' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400' :
+                  'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                }`}>
+                  {selectedTask.priority === 'urgent' ? 'Urgente' :
+                   selectedTask.priority === 'high' ? 'Haute' :
+                   selectedTask.priority === 'medium' ? 'Moyenne' : 'Basse'}
+                </span>
+              </div>
+
+              {/* Status */}
+              <div>
+                <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Statut</h4>
+                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                  selectedTask.status === 'completed' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' :
+                  selectedTask.status === 'in_progress' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400' :
+                  'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                }`}>
+                  {selectedTask.status === 'completed' ? 'Complétée' :
+                   selectedTask.status === 'in_progress' ? 'En cours' : 'À faire'}
+                </span>
+              </div>
+
+              {/* Tags */}
+              {selectedTask.tags && selectedTask.tags.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Tags</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedTask.tags.map((tag, index) => (
+                      <span 
+                        key={index}
+                        className="inline-flex items-center px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs rounded"
+                      >
+                        #{tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-b-lg flex justify-end gap-2">
+              <button
+                onClick={() => setSelectedTask(null)}
+                className="btn-secondary text-sm"
+              >
+                Fermer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      </div>
     </div>
   );
 };

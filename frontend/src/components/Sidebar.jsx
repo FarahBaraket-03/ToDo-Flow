@@ -6,7 +6,8 @@ import {
   Plus,
   Hash,
   ChevronDown,
-  CalendarClock
+  CalendarClock,
+  BarChart3
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -21,6 +22,7 @@ const Sidebar = ({ projects = [], onAddTask, isOpen, onClose }) => {
     { icon: Calendar, label: "Aujourd'hui", path: '/today' },
     { icon: CalendarClock, label: 'Prochainement', path: '/upcoming' },
     { icon: CheckCircle, label: 'Complétés', path: '/completed' },
+    { icon: BarChart3, label: 'Statistiques', path: '/stats' },
   ];
 
   return (

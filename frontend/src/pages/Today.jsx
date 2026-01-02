@@ -3,12 +3,13 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { format, isPast, startOfDay } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Plus, Filter, CheckCircle2, Circle, AlertCircle, ChevronDown, Inbox, Calendar } from 'lucide-react';
+import { Plus, Filter, CheckCircle2, Circle, AlertCircle, ChevronDown, Inbox, Calendar, Grid3x3, List } from 'lucide-react';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 import TaskList from '../components/TaskList';
 import AddTaskForm from '../components/AddTaskForm';
 import EditTaskForm from '../components/EditTaskForm';
+import useKeyboardShortcuts from '../hooks/useKeyboardShortcuts';
 import api from '../api/axios';
 import toast from 'react-hot-toast';
 
@@ -18,19 +19,67 @@ const Today = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddTask, setShowAddTask] = useState(false);
-  const [filterStatus, setFilterStatus] = useState('all'); // all, todo, completed
-  const [filterPriority, setFilterPriority] = useState('all');
+  const [filterStatus, setFilterStatus] = useState(() => {
+    return localStorage.getItem('today_filterStatus') || 'all';
+  });
+  const [filterPriority, setFilterPriority] = useState(() => {
+    return localStorage.getItem('today_filterPriority') || 'all';
+  });
   const [showFilters, setShowFilters] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const [showEditTask, setShowEditTask] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false); // Separate modal for editing
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [viewMode, setViewMode] = useState(() => {
+    return localStorage.getItem('today_viewMode') || 'list';
+  });
+
+  // Save filters to localStorage when they change
+  useEffect(() => {
+    localStorage.setItem('today_filterStatus', filterStatus);
+  }, [filterStatus]);
+
+  useEffect(() => {
+    localStorage.setItem('today_filterPriority', filterPriority);
+  }, [filterPriority]);
+
+  useEffect(() => {
+    localStorage.setItem('today_viewMode', viewMode);
+  }, [viewMode]);
+
+  // Keyboard shortcuts
+  useKeyboardShortcuts([
+    {
+      key: 'n',
+      ctrl: true,
+      callback: () => {
+        setShowAddTask(true);
+        toast('Nouvelle tâche', { icon: '✨' });
+      }
+    },
+    {
+      key: 'f',
+      ctrl: true,
+      callback: () => {
+        setShowFilters(!showFilters);
+        toast('Filtres', { icon: '🔍' });
+      }
+    },
+    {
+      key: 'Escape',
+      callback: () => {
+        if (showAddTask) setShowAddTask(false);
+        if (showEditTask) setShowEditTask(false);
+        if (showFilters) setShowFilters(false);
+      }
+    }
+  ]);
 
   useEffect(() => {
     if (isAuthenticated) {
       fetchTasks();
       fetchProjects();
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, showFilters]);
 
   const fetchTasks = async () => {
     try {
@@ -117,19 +166,27 @@ const Today = () => {
   const todayFormatted = format(today, 'EEEE d MMMM', { locale: fr });
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      <Sidebar 
-        projects={projects} 
-        onAddTask={() => setShowAddTask(true)} 
-        isOpen={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
-      />
-      
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <Header onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 overflow-hidden">
+      {/* Animated background elements */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-20 right-10 w-72 h-72 bg-primary-200 dark:bg-primary-900/30 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+        <div className="absolute top-40 left-10 w-72 h-72 bg-blue-200 dark:bg-blue-900/30 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="absolute -bottom-8 left-20 w-72 h-72 bg-purple-200 dark:bg-purple-900/30 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+      </div>
+
+      <div className="relative z-10 flex h-screen overflow-hidden">
+        <Sidebar 
+          projects={projects} 
+          onAddTask={() => setShowAddTask(true)} 
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+        />
         
-        <main className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900">
-          <div className="max-w-5xl mx-auto px-4 md:px-8 py-4 md:py-8">
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <Header onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
+          
+          <main className="flex-1 overflow-y-auto">
+            <div className="max-w-5xl mx-auto px-4 md:px-8 py-4 md:py-8">
             {/* Header with stats */}
             <div className="mb-8">
               <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center gap-2">
@@ -196,67 +253,180 @@ const Today = () => {
               </button>
 
               {showFilters && (
-                <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Statut</label>
-                    <select
-                      value={filterStatus}
-                      onChange={(e) => setFilterStatus(e.target.value)}
-                      className="input-field"
-                    >
-                      <option value="all">Tous</option>
-                      <option value="todo">À faire</option>
-                      <option value="in_progress">En cours</option>
-                      <option value="completed">Complétées</option>
-                    </select>
+                <div className="mt-4 space-y-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Statut</label>
+                      <select
+                        value={filterStatus}
+                        onChange={(e) => setFilterStatus(e.target.value)}
+                        className="input-field"
+                      >
+                        <option value="all">Tous</option>
+                        <option value="todo">À faire</option>
+                        <option value="in_progress">En cours</option>
+                        <option value="completed">Complétées</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Priorité</label>
+                      <select
+                        value={filterPriority}
+                        onChange={(e) => setFilterPriority(e.target.value)}
+                        className="input-field"
+                      >
+                        <option value="all">Toutes</option>
+                        <option value="urgent">Urgente</option>
+                        <option value="high">Haute</option>
+                        <option value="medium">Moyenne</option>
+                        <option value="low">Basse</option>
+                      </select>
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Priorité</label>
-                    <select
-                      value={filterPriority}
-                      onChange={(e) => setFilterPriority(e.target.value)}
-                      className="input-field"
+                  {(filterStatus !== 'all' || filterPriority !== 'all') && (
+                    <button
+                      onClick={() => {
+                        setFilterStatus('all');
+                        setFilterPriority('all');
+                        toast.success('Filtres réinitialisés');
+                      }}
+                      className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 underline"
                     >
-                      <option value="all">Toutes</option>
-                      <option value="urgent">Urgente</option>
-                      <option value="high">Haute</option>
-                      <option value="medium">Moyenne</option>
-                      <option value="low">Basse</option>
-                    </select>
-                  </div>
+                      Réinitialiser les filtres
+                    </button>
+                  )}
                 </div>
               )}
             </div>
 
-            {/* Add task button */}
-            <button
-              onClick={() => setShowAddTask(true)}
-              className="w-full flex items-center gap-2 p-4 text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-colors mb-6 border-2 border-dashed border-primary-200 dark:border-primary-800 bg-white dark:bg-gray-800"
-            >
-              <Plus className="w-5 h-5" />
-              <span className="font-medium">Ajouter une tâche</span>
-            </button>
+            {/* View mode toggle and Add task button */}
+            <div className="flex items-center gap-3 mb-6">
+              <button
+                onClick={() => setShowAddTask(true)}
+                className="flex-1 flex items-center gap-2 p-4 text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-all duration-200 border-2 border-dashed border-primary-200 dark:border-primary-800 bg-white dark:bg-gray-800 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+                aria-label="Ajouter une nouvelle tâche (Ctrl+N)"
+              >
+                <Plus className="w-5 h-5" />
+                <span className="font-medium">Ajouter une tâche</span>
+                <span className="ml-auto text-xs text-gray-400 dark:text-gray-500 hidden sm:block">Ctrl+N</span>
+              </button>
+
+              {/* View mode toggle */}
+              <div className="flex bg-white dark:bg-gray-800 rounded-lg p-1 border border-gray-200 dark:border-gray-700 shadow-sm">
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`p-2 rounded transition-colors ${
+                    viewMode === 'list'
+                      ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  }`}
+                  aria-label="Vue liste"
+                  title="Vue liste"
+                >
+                  <List className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={`p-2 rounded transition-colors ${
+                    viewMode === 'grid'
+                      ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  }`}
+                  aria-label="Vue grille"
+                  title="Vue grille"
+                >
+                  <Grid3x3 className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
 
             {/* Grouped Tasks */}
-            {loading ? (
-              <div className="space-y-4">
-                {[...Array(3)].map((_, i) => (
-                  <div key={i} className="bg-white rounded-lg p-4 h-20 skeleton" />
-                ))}
-              </div>
-            ) : filteredTasks.length === 0 ? (
-              <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                <div className="text-gray-400 mb-4">
-                  <Circle className="w-16 h-16 mx-auto" />
-                </div>
-                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Aucune tâche pour aujourd'hui</h3>
-                <p className="text-gray-500 dark:text-gray-400">Ajoutez une tâche pour commencer</p>
+            {filteredTasks.length === 0 ? (
+              <TaskList
+                tasks={[]}
+                loading={loading}
+                onTaskUpdate={handleTaskUpdate}
+                onTaskDelete={handleTaskDelete}
+                emptyTitle="Aucune tâche pour aujourd'hui"
+                emptyDescription="Profitez de cette journée productive !"
+                onAddTask={() => setShowAddTask(true)}
+              />
+            ) : viewMode === 'grid' ? (
+              <div className="space-y-6">
+                {/* Overdue Tasks Grid */}
+                {groupedTasks.overdue.length > 0 && (
+                  <section aria-label="Tâches en retard">
+                    <div className="flex items-center gap-2 mb-3">
+                      <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
+                      <h2 className="text-lg font-semibold text-red-900 dark:text-red-100">
+                        En retard ({groupedTasks.overdue.length})
+                      </h2>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {groupedTasks.overdue.map((task) => (
+                        <TaskList
+                          key={task.id}
+                          tasks={[task]}
+                          loading={false}
+                          onTaskUpdate={handleTaskUpdate}
+                          onTaskDelete={handleTaskDelete}
+                        />
+                      ))}
+                    </div>
+                  </section>
+                )}
+
+                {/* Pending Tasks Grid */}
+                {groupedTasks.pending.length > 0 && (
+                  <section aria-label="Tâches à faire">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Circle className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+                      <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                        À faire ({groupedTasks.pending.length})
+                      </h2>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {groupedTasks.pending.map((task) => (
+                        <TaskList
+                          key={task.id}
+                          tasks={[task]}
+                          loading={false}
+                          onTaskUpdate={handleTaskUpdate}
+                          onTaskDelete={handleTaskDelete}
+                        />
+                      ))}
+                    </div>
+                  </section>
+                )}
+
+                {/* Completed Tasks Grid */}
+                {groupedTasks.completed.length > 0 && (
+                  <section aria-label="Tâches complétées">
+                    <div className="flex items-center gap-2 mb-3">
+                      <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400" />
+                      <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                        Complétées ({groupedTasks.completed.length})
+                      </h2>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {groupedTasks.completed.map((task) => (
+                        <TaskList
+                          key={task.id}
+                          tasks={[task]}
+                          loading={false}
+                          onTaskUpdate={handleTaskUpdate}
+                          onTaskDelete={handleTaskDelete}
+                        />
+                      ))}
+                    </div>
+                  </section>
+                )}
               </div>
             ) : (
               <div className="space-y-6">
                 {/* Overdue Tasks */}
                 {groupedTasks.overdue.length > 0 && (
-                  <div>
+                  <section aria-label="Tâches en retard">
                     <div className="flex items-center gap-2 mb-3">
                       <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
                       <h2 className="text-lg font-semibold text-red-900 dark:text-red-100">
@@ -269,12 +439,12 @@ const Today = () => {
                       onTaskUpdate={handleTaskUpdate}
                       onTaskDelete={handleTaskDelete}
                     />
-                  </div>
+                  </section>
                 )}
 
                 {/* Pending Tasks */}
                 {groupedTasks.pending.length > 0 && (
-                  <div>
+                  <section aria-label="Tâches à faire">
                     <div className="flex items-center gap-2 mb-3">
                       <Circle className="w-5 h-5 text-orange-600 dark:text-orange-400" />
                       <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
@@ -287,12 +457,12 @@ const Today = () => {
                       onTaskUpdate={handleTaskUpdate}
                       onTaskDelete={handleTaskDelete}
                     />
-                  </div>
+                  </section>
                 )}
 
                 {/* Completed Tasks */}
                 {groupedTasks.completed.length > 0 && (
-                  <div>
+                  <section aria-label="Tâches complétées">
                     <div className="flex items-center gap-2 mb-3">
                       <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400" />
                       <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
@@ -305,12 +475,12 @@ const Today = () => {
                       onTaskUpdate={handleTaskUpdate}
                       onTaskDelete={handleTaskDelete}
                     />
-                  </div>
+                  </section>
                 )}
 
                 {/* Progress Bar */}
                 {stats.total > 0 && (
-                  <div className="mt-8 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                  <div className="mt-8 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 animate-fade-in" role="region" aria-label="Progression du jour">
                     <div className="flex items-center justify-between mb-3">
                       <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Progression du jour</span>
                       <span className="text-sm font-semibold text-primary-600 dark:text-primary-400">
@@ -331,7 +501,8 @@ const Today = () => {
               </div>
             )}
           </div>
-        </main>
+          </main>
+        </div>
       </div>
 
       {/* Add Task Modal */}

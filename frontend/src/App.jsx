@@ -2,8 +2,10 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Toaster } from 'react-hot-toast'
 import { AuthProvider } from './context/AuthContext'
 import { DarkModeProvider } from './context/DarkModeContext'
+import KeyboardShortcutsHelp from './components/KeyboardShortcutsHelp'
 import Login from './pages/Login'
 import Register from './pages/Register'
+import Welcome from './pages/Welcome'
 import Dashboard from './pages/Dashboard'
 import Today from './pages/Today'
 import Inbox from './pages/Inbox'
@@ -13,6 +15,7 @@ import Projects from './pages/Projects'
 import ProjectDetail from './pages/ProjectDetail'
 import Tags from './pages/Tags'
 import Profile from './pages/Profile'
+import Stats from './pages/Stats'
 
 function App() {
   return (
@@ -23,6 +26,7 @@ function App() {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/welcome" element={<Welcome />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/today" element={<Today />} />
             <Route path="/inbox" element={<Inbox />} />
@@ -32,8 +36,13 @@ function App() {
             <Route path="/projects/:projectId" element={<ProjectDetail />} />
             <Route path="/tags" element={<Tags />} />
             <Route path="/profile" element={<Profile />} />
-            <Route path="/" element={<Navigate to="/today" replace />} />
+            <Route path="/stats" element={<Stats />} />
+            <Route path="/" element={<Navigate to="/welcome" replace />} />
           </Routes>
+          
+          {/* Keyboard shortcuts help button */}
+          <KeyboardShortcutsHelp />
+          
           <Toaster 
             position="top-right"
             toastOptions={{

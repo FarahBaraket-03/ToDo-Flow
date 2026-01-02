@@ -47,10 +47,10 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('user', JSON.stringify(user));
       setUser(user);
 
-      toast.success('Welcome back!');
-      navigate('/today');
+      toast.success('Bienvenue !');
+      navigate('/welcome');
     } catch (error) {
-      const message = error.response?.data?.message || 'Login failed';
+      const message = error.response?.data?.message || 'Erreur de connexion';
       toast.error(message);
       throw error;
     }
@@ -65,10 +65,10 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('user', JSON.stringify(user));
       setUser(user);
 
-      toast.success('Account created successfully!');
-      navigate('/today');
+      toast.success('Compte créé avec succès !');
+      navigate('/welcome');
     } catch (error) {
-      const message = error.response?.data?.message || 'Registration failed';
+      const message = error.response?.data?.message || 'Erreur d\'enregistrement';
       toast.error(message);
       throw error;
     }

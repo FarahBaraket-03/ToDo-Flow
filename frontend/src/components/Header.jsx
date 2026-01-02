@@ -174,28 +174,33 @@ const Header = ({ onMenuClick }) => {
   };
 
   return (
-    <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-20 shadow-sm transition-colors duration-300">
+    <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-20 shadow-sm transition-colors duration-300" role="banner">
       <div className="flex items-center justify-between px-4 md:px-6 py-3">
         {/* Menu button for mobile */}
         <button
           onClick={onMenuClick}
-          className="lg:hidden p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors mr-2"
-          aria-label="Toggle menu"
+          className="lg:hidden p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors mr-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+          aria-label="Ouvrir le menu"
+          aria-expanded={false}
         >
           <Menu className="w-6 h-6 text-gray-700 dark:text-gray-300" />
         </button>
 
         {/* Search */}
         <div className="flex-1 max-w-2xl relative" ref={searchRef}>
-          <form onSubmit={handleSearch} className="relative hidden md:block">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
+          <form onSubmit={handleSearch} className="relative hidden md:block" role="search">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" aria-hidden="true" />
             <input
               type="text"
-              placeholder="Rechercher des tâches, projets..."
+              placeholder="Rechercher des tâches, projets... (Ctrl+K)"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => searchQuery && setShowSearchResults(true)}
               className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white dark:focus:bg-gray-600 transition-all text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
+              aria-label="Rechercher dans l'application"
+              aria-autocomplete="list"
+              aria-controls={showSearchResults ? "search-results" : undefined}
+              aria-expanded={showSearchResults}
             />
             {searchQuery && (
               <button
@@ -204,7 +209,8 @@ const Header = ({ onMenuClick }) => {
                   setSearchQuery('');
                   setShowSearchResults(false);
                 }}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded"
+                aria-label="Effacer la recherche"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -213,7 +219,12 @@ const Header = ({ onMenuClick }) => {
 
           {/* Search Results Dropdown */}
           {showSearchResults && searchQuery && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 max-h-96 overflow-y-auto z-50 hidden md:block">
+            <div 
+              id="search-results"
+              className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 max-h-96 overflow-y-auto z-50 hidden md:block animate-slide-down"
+              role="listbox"
+              aria-label="Résultats de recherche"
+            >
               {searchLoading ? (
                 <div className="p-8 text-center">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
