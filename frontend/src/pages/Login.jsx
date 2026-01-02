@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
-import logo from '../assets/todo-list-svgrepo-com.svg';
-import illustration from '../assets/do.jpg';
+
+const logo = import.meta.env.VITE_img_URL10;
+const illustration = import.meta.env.VITE_img_URL6;
 
 const Login = () => {
   const { login, isAuthenticated } = useAuth();

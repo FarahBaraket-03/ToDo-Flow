@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { ArrowRight, CheckCircle, Zap, BarChart3 } from 'lucide-react';
-import logo from '../assets/todo-list-svgrepo-com.svg';
-import illustration1 from '../assets/10fb1d13f52c93a6316b3092bd4bb200.gif';
-import illustration2 from '../assets/4abcd40991f3f78f4250f8142c11b85d.jpg';
-import illustration3 from '../assets/d350f29c46c49ba93e097e3f87a7b201.jpg';
+
+const logo = import.meta.env.VITE_img_URL10;
+const illustration1 = import.meta.env.VITE_img_URL3;
+const illustration2 = import.meta.env.VITE_img_URL4;
+const illustration3 = import.meta.env.VITE_img_URL5;
 
 const Welcome = () => {
   const { isAuthenticated, user } = useAuth();
