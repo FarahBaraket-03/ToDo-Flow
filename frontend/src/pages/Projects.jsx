@@ -137,6 +137,7 @@ const Projects = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -188,10 +189,15 @@ const Projects = () => {
       </div>
 
       <div className="relative z-10 flex h-screen overflow-hidden">
-        <Sidebar projects={projects} onAddTask={() => {}} />
+        <Sidebar
+          projects={projects}
+          onAddTask={() => {}}
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+        />
         
         <div className="flex-1 flex flex-col overflow-hidden">
-          <Header />
+          <Header onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
           
           <main className="flex-1 overflow-y-auto">
           <div className="max-w-5xl mx-auto px-8 py-8">

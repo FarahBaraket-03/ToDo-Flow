@@ -12,6 +12,7 @@ const Profile = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('general');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   
   const [profileData, setProfileData] = useState({
     name: user?.name || '',
@@ -129,10 +130,15 @@ const Profile = () => {
       </div>
 
       <div className="relative z-10 flex h-screen overflow-hidden">
-        <Sidebar projects={projects} onAddTask={() => {}} />
+        <Sidebar
+          projects={projects}
+          onAddTask={() => {}}
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+        />
         
         <div className="flex-1 flex flex-col overflow-hidden">
-          <Header />
+          <Header onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
           
           <main className="flex-1 overflow-y-auto">
           <div className="max-w-5xl mx-auto px-8 py-8">
