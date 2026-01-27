@@ -1,4 +1,4 @@
-# 📝 TodoApp - Modern Task Management Application
+# 📝 Todo Flow - Modern Task Management Application
 
 A full-stack todo application inspired by Todoist, built with React, Node.js, PostgreSQL, and AWS integration. Organize your tasks, manage projects, and boost your productivity.
 
@@ -6,6 +6,14 @@ A full-stack todo application inspired by Todoist, built with React, Node.js, Po
 ![Node](https://img.shields.io/badge/Node.js-18+-green)
 ![React](https://img.shields.io/badge/React-18-blue)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue)
+
+
+
+<img width="1914" height="1017" alt="Capture d&#39;écran 2026-01-16 152306" src="https://github.com/user-attachments/assets/d998bffa-9115-42de-817a-f757f6516181" />
+
+<img width="1913" height="1013" alt="Capture d&#39;écran 2026-01-16 152253" src="https://github.com/user-attachments/assets/da54a54f-4707-4071-a6ef-331003b364c5" />
+
+<img width="1911" height="963" alt="Capture d&#39;écran 2026-01-16 152241" src="https://github.com/user-attachments/assets/991c8544-5645-4288-8f96-f65aa285eda6" />
 
 ## ✨ Features
 
