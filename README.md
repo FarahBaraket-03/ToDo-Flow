@@ -2,6 +2,8 @@
 
 A full-stack todo application inspired by Todoist, built with React, Node.js, PostgreSQL, and AWS integration. Organize your tasks, manage projects, and boost your productivity.
 
+> **Cloud Agent Note:** This README has been updated to reflect the full feature set and correct setup instructions for the Todo Flow application.
+
 ![TodoApp Preview](https://img.shields.io/badge/Status-Ready-success)
 ![Node](https://img.shields.io/badge/Node.js-18+-green)
 ![React](https://img.shields.io/badge/React-18-blue)
@@ -24,6 +26,16 @@ A full-stack todo application inspired by Todoist, built with React, Node.js, Po
 - **Due Dates** - Schedule tasks with calendar integration
 - **Task Completion** - Mark tasks as complete with visual feedback
 - **Search & Filter** - Quickly find tasks by status, project, or date
+- **Tags** - Label and categorize tasks with custom tags
+- **Undo Delete** - Restore accidentally deleted tasks within 5 seconds
+
+### 📅 Views
+- **Inbox** - Capture all tasks in one place
+- **Today** - Focus on tasks due today
+- **Upcoming** - Plan ahead with scheduled tasks
+- **Completed** - Review finished tasks
+- **Stats** - Visualize productivity with charts and statistics
+- **Projects** - Browse and manage all your projects
 
 ### 👤 User Features
 - **Authentication** - Secure JWT-based authentication
@@ -35,6 +47,13 @@ A full-stack todo application inspired by Todoist, built with React, Node.js, Po
 - **Responsive Layout** - Works on desktop, tablet, and mobile
 - **Dark Mode Ready** - Comfortable viewing experience
 - **Smooth Animations** - Polished interactions with Framer Motion
+- **Skeleton Loaders** - Realistic loading states for tasks and projects
+- **Keyboard Shortcuts** - Boost productivity with keyboard navigation
+
+### ♿ Accessibility
+- **ARIA Labels** - Screen reader support throughout
+- **Keyboard Navigation** - Full keyboard accessibility
+- **Focus Management** - Logical tab order and visible focus rings
 
 ### ☁️ AWS Integration
 - **S3 Storage** - File attachments support
@@ -72,7 +91,7 @@ Before you begin, ensure you have the following installed:
 #### 1. Clone the repository
 ```bash
 git clone <your-repo-url>
-cd "projet aws"
+cd ToDo-Flow
 ```
 
 #### 2. Setup Database
@@ -153,10 +172,24 @@ todo-app-aws/
 │
 ├── frontend/                   # React application
 │   ├── src/
-│   │   ├── api/               # API client
+│   │   ├── api/               # API client (Axios)
 │   │   ├── components/        # Reusable components
-│   │   ├── context/           # React context
+│   │   ├── context/           # React context (Auth, DarkMode)
+│   │   ├── hooks/             # Custom hooks (keyboard shortcuts, stats, undo)
 │   │   ├── pages/             # Page components
+│   │   │   ├── Welcome.jsx    # Landing page
+│   │   │   ├── Dashboard.jsx  # Overview & statistics
+│   │   │   ├── Inbox.jsx      # All tasks inbox
+│   │   │   ├── Today.jsx      # Tasks due today
+│   │   │   ├── Upcoming.jsx   # Scheduled tasks
+│   │   │   ├── Completed.jsx  # Finished tasks
+│   │   │   ├── Projects.jsx   # Project list
+│   │   │   ├── ProjectDetail.jsx # Single project view
+│   │   │   ├── Tags.jsx       # Task tags management
+│   │   │   ├── Stats.jsx      # Charts & analytics
+│   │   │   ├── Profile.jsx    # User profile
+│   │   │   ├── Login.jsx      # Authentication
+│   │   │   └── Register.jsx   # Registration
 │   │   ├── App.jsx            # Main app component
 │   │   └── main.jsx           # Entry point
 │   ├── index.html
@@ -360,6 +393,16 @@ npm test
 # E2E tests
 npm run test:e2e
 ```
+
+## ⌨️ Keyboard Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| `Ctrl + N` | Create a new task |
+| `Ctrl + F` | Toggle filters |
+| `Ctrl + K` | Focus search bar |
+| `Escape` | Close modals / dialogs |
+| `Shift + ?` | Show keyboard shortcuts help |
 
 ## 📝 Development
 
