@@ -26,12 +26,78 @@ A full-stack todo application inspired by Todoist, built with React, Node.js, Po
 - **Modern Design** - Clean, intuitive Todoist-inspired interface
 - **Responsive Layout** - Works on desktop, tablet, and mobile
 - **Dark Mode Ready** - Comfortable viewing experience
-- **Smooth Animations** - Polished interactions with Framer Motion
+- **Smooth Animations** - Polished interactions and micro-animations
+- **Skeleton Loaders** - Realistic loading placeholders for tasks and projects
+- **Empty States** - Illustrated empty states with custom SVG icons
+- **Grid / List View** - Toggle between list and card grid layouts (preference saved locally)
+- **Keyboard Shortcuts** - Power-user shortcuts (`Ctrl+N`, `Ctrl+F`, `Ctrl+K`, `Shift+?`, `Escape`)
+- **Touch Gestures** - Swipe to delete on mobile, bottom-sheet forms
+- **Persistent Filters** - Status and priority filters saved across sessions
+- **Smart Tag Autocomplete** - Inline suggestions from existing task tags
+- **Undo Delete** - 5-second undo toast after deleting a task
+- **Drag & Drop** - Drag handle on task items for reordering
 
 ### ☁️ AWS Integration
 - **S3 Storage** - File attachments support
 - **RDS Database** - Production-ready PostgreSQL hosting
 - **Scalable Architecture** - Built for cloud deployment
+
+## 🎨 UX/UI Improvements
+
+A comprehensive set of UX/UI enhancements has been implemented to improve usability, performance, and accessibility. Full documentation is available in:
+
+- [`frontend/UX_UI_IMPROVEMENTS.md`](frontend/UX_UI_IMPROVEMENTS.md) – Animations, loading states, accessibility, dark mode, and responsive/mobile improvements
+- [`frontend/FONCTIONNALITES_UX.md`](frontend/FONCTIONNALITES_UX.md) – Undo delete, smart autocomplete, grid view, persistent filters, and drag & drop
+
+### 🎭 Animations & Micro-interactions
+- **CSS Keyframe animations** – `slide-up`, `slide-down`, `fade-in`, `scale-in`, `bounce-subtle`, `shake`, `pulse-ring`
+- **Stagger animations** – Task lists appear with a progressive cascade effect (50ms delay between items)
+- **Completion animation** – Bounce + scale feedback on task checkbox
+- **Leave animation** – Smooth removal effect on task deletion
+- **Pulse ring** – Visual feedback on pending API requests
+
+### ⏳ Loading States
+- **TaskSkeleton** – Realistic skeleton loader for tasks (5 placeholders shown during load)
+- **ProjectSkeleton** – Skeleton loader for projects
+- **EmptyState** – Reusable component with custom animated SVG illustrations (tasks, projects, search)
+
+### ♿ Accessibility
+- All buttons have descriptive `aria-label` attributes
+- Modals use `role="dialog"` and `aria-modal="true"`
+- `aria-required` and `aria-invalid` on form fields
+- `focus-visible` rings on all interactive elements (`ring-2 ring-primary-500 ring-offset-2`)
+- Logical tab order and `Escape` key support throughout
+
+### ⌨️ Keyboard Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| `Ctrl + N` | New task |
+| `Ctrl + F` | Toggle filters |
+| `Ctrl + K` | Focus search |
+| `Escape` | Close modals / dropdowns |
+| `Shift + ?` | Show keyboard shortcuts help |
+
+### 📱 Responsive & Mobile
+- **Bottom sheet** – `AddTaskForm` becomes a slide-up bottom sheet on mobile
+- **Swipe to delete** – Swipe a task left to reveal the delete action (60px threshold)
+- **Touch-friendly** – All interactive targets are at least 44×44 px
+- **Responsive breakpoints** – `sm:` 640px / `md:` 768px / `lg:` 1024px
+
+### 🚀 Advanced UX Features
+- **Undo Delete** – Optimistic deletion with a 5-second undo toast (`react-hot-toast`)
+- **Smart Tag Autocomplete** – Dropdown of matching existing tags while typing (max 5 suggestions, already-added tags excluded)
+- **Grid / List View Toggle** – Switch between list and card grid; preference persisted in `localStorage`
+- **Persistent Filters** – Status (`all`, `todo`, `in_progress`, `completed`) and priority filters saved in `localStorage` and restored on page reload
+- **Drag & Drop** – `GripVertical` drag handle on task items; visual opacity feedback while dragging
+
+### 💾 localStorage Keys
+
+| Key | Values | Description |
+|-----|--------|-------------|
+| `today_filterStatus` | `all`, `todo`, `in_progress`, `completed` | Status filter |
+| `today_filterPriority` | `all`, `urgent`, `high`, `medium`, `low` | Priority filter |
+| `today_viewMode` | `list`, `grid` | Display mode |
 
 ## 🏗️ Architecture
 
